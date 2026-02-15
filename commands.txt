@@ -1,0 +1,78 @@
+eksctl create cluster -f eks-config.yaml
+aws eks list-clusters --region us-east-2
+aws eks update-kubeconfig --region us-east-2 --name <your-cluster-name>
+kubectl config current-context
+Set-Alias k kubectl
+
+k get nodes
+
+k describe nodes <node-name>     -> check labels | in ec2 instances -> check tags
+k describe node ip-192-168-109-250.us-east-2.compute.internal
+
+kubectl get nodes --show-labels | grep topology.kubernetes.io/zone
+
+kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=release-1.44"
+
+k get ds -n kube-system
+k get deployment -n kube-system
+kubectl get daemonset ebs-csi-node -n kube-system
+kubectl get deploy ebs-csi-controller -n kube-system
+
+k apply -f sc.yaml
+k get sc 
+k describe sc <sc-name>
+k describe sc ebs-sc-gp3
+
+k create ns mysql-ha
+k apply -f mysql-hs.yaml
+k get svc -n mysql-ha
+kubectl config set-context --current --namespace=mysql-ha
+k get svc mysql   ->Endpoints=None
+
+k api-resources
+
+k apply -f mysql-sts.yaml
+k get pods -> one by one - sequence - order start
+k get pods -o wide -> all in different nodes/AZs
+
+k get sts
+k describe sts mysql
+
+Check AWS >EC2> Volumes
+
+k get pvc -> automaticlaly created with sts volumeclaimtemplates field
+
+k get pv
+
+mysql-sts.yaml -> change replicas:3 -> 4
+k get pods -> pending state? why? hard rule> anti affinity > no 4th zone available
+k delete pods mysql-3
+
+k delete sts mysql
+
+Check AWS >EC2> Volumes > still available
+ 
+k get pvc
+k get pv
+k get sts
+
+k apply -f mysql-sts.yaml
+
+Check AWS >EC2> Volumes > available --> in use state
+
+k describe sts mysql
+
+deleetion ->sts > pvc > pv / or entire cluster delete
+
+
+DEMO 2
+
+k get nodes -- show-labels
+k get pods -o wide  > 3 pods 4 nodes
+
+k get pods -w
+
+AWS > EC2 - delete one of the pods-nodes
+
+k desricbe pod mysql-0
+
